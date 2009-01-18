@@ -10,6 +10,7 @@
 pygame-fenix is a library for Python that allows one to write games with Pygame, but using concepts such as processes and frames inspired by Fenix.
 
 It uses an actor based model for game objects, automatically handling rendering in the game world. All the developer has to do is tell it where things need to go.
+
 Generators are used to simulate a frame system. Rather than a monolithic game loop for your objects, you can have your object stop at a specific point in it's code and continue on in the next frame.
 
 It also includes helpful routines such as getting the distances between two processes, collision detection and easy input routines.
@@ -17,6 +18,7 @@ It also includes helpful routines such as getting the distances between two proc
 ## Example
 
 This example will display a character on screen. The player use the cursor keys to rotate the character and move him backwards/forwards (like a car). 
+
 For more examples check the "examples" directory.
 
 
