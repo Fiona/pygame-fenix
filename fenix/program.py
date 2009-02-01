@@ -544,6 +544,40 @@ class Program:
     ##############################################
     # MATH STUFF
     ##############################################
+    @classmethod
+    def near_angle(cls, curr_angle, targ_angle, increment):
+        """ 
+        Returns an angle which has been moved from 'curr_angle' closer to 
+        'targ_angle' by 'increment'. increment should always be positive, as 
+        angle will be rotated in the direction resulting in the shortest 
+        distance to the target angle.
+        """
+        # Normalise curr_angle
+        if curr_angle > 180000:
+            curr_angle -= 360000 * ((curr_angle-180000)/360000 + 1)
+        if curr_angle < -180000:
+            curr_angle += 360000 * ((-curr_angle-180000)/360000 + 1)
+            
+        # Normalise targ_angle
+        if targ_angle > 180000:
+            targ_angle -= 360000 * ((curr_angle-180000)/360000 + 1)
+        if targ_angle < -180000:
+            targ_angle += 360000 * ((-curr_angle-180000)/360000 + 1)
+            
+        # calculate difference
+        difference = targ_angle - curr_angle
+        if difference > 180000:
+            difference -= 360000
+        if difference < -180000:
+            difference += 360000
+            
+        # do increment
+        if math.fabs(difference) < increment:
+            return targ_angle
+        else:
+            dir = difference / math.fabs(difference)
+            return curr_angle + increment*dir
+    
     @classmethod    
     def fget_angle(cls, pointax, pointay, pointbx, pointby):
          return math.degrees(math.atan2(-(pointby - pointay), pointbx - pointax))*1000
