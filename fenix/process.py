@@ -168,11 +168,13 @@ class Process(object):
 			  
 		if type(other) == type(""):
 
+			# TODO: Ouch. Maybe hash by process type name?
 			for obj in program.Program.processes:
-				if program.Program.processes[obj].__class__.__name__ == other:
-					check = self.single_object_collision(program.Program.processes[obj], box)
-					if check != False:
-						return check
+				if obj != self.id:
+					if program.Program.processes[obj].__class__.__name__ == other:					
+						check = self.single_object_collision(program.Program.processes[obj], box)
+						if check != False:
+							return check
 				
 			return False
 
@@ -180,13 +182,16 @@ class Process(object):
 			
 			other = program.Program.p(other)
 			
-			if other != None:
+			if other != None and other != self:
 				return self.single_object_collision(other, box)
 			else:
 				return False
 			
 		else:
-			return self.single_object_collision(other, box)
+			if other != None and other != self:
+				return self.single_object_collision(other, box)
+			else:
+				return False
 
 		
 	def single_object_collision(self, other, box):
@@ -286,4 +291,12 @@ class Process(object):
 		self.__dict__[name] = value	   
 		if name == "z": program.Program.z_order_dirty = True
 		if name == "priority": program.Program.priority_order_dirty = True
+		
+	def on_exit(self):
+		"""
+		May be overidden by subclasses to perform cleanup operations. This method
+		is called by Program when a process comes to an end - either by reaching
+		the end of its 'begin' method or after being killed by a signal.
+		"""
+		pass
 

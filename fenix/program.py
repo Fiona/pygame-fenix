@@ -192,6 +192,8 @@ class Scroll:
         if name == "graph" and self.graph != None: self.rect = self.graph.get_rect()
         if name == "background" and self.background != None: self.back_rect = self.background.get_rect()
 
+    def on_exit(self):
+        pass
             
 
 class Program:   
@@ -340,6 +342,8 @@ class Program:
 
         cls.processes_z.remove(ref)
         cls.processes_priority.remove(ref)
+
+        ref.on_exit()
 
         del(ref)
         
