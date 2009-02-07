@@ -147,15 +147,21 @@ class Process(object):
 				return True
 
 			point = (
-					 (point[0]+(self.graph_size[0]/2))-self.x,
-					 (point[1]+(self.graph_size[1]/2))-self.y
+					 point[0]-(self.x-self.rect.width/2),
+					 point[1]-(self.y-self.rect.height/2)
 					 )
-			print self.get_real_surface().get_at(point)
-			if self.get_real_surface().get_at(point) == (255, 0, 255, 255):
-				return False
+			"""
+			TODO: this check could be avoided if self.rect was guaranteed to be 
+			the same size as the surface. It appears to be a pixel out sometimes.
+			"""
+			surface = self.get_real_surface() 
+			if point[0]<surface.get_width() and point[1]<surface.get_height():
+				if self.get_real_surface().get_at(point) == (255, 0, 255, 255):
+					return False				
+				else:
+					return True
 			else:
-				return True
-			
+				return False			
 		else:
 			return False
 		
