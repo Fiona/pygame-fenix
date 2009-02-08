@@ -103,7 +103,7 @@ class Process(object):
 	def get_real_surface(self):
 		""" Returns a real-world reprisentation of graphic including size and angle """
 		
-		if (self.size == 100 and self.angle == 0 and self.flags == 0):
+		if (self.size == 100 and self.angle == 0 and self.flags == 0 and self.alpha >= 255):
 			return self.graph
 		elif self.redraw_transform_graph == False:
 			return self.transform_graph_cached
@@ -291,7 +291,7 @@ class Process(object):
 	
 		
 	def __setattr__(self, name, value):
-		if self.__dict__.has_key(name) and name in ['graph', 'size', 'angle', 'flags'] and self.__dict__[name] != value:
+		if self.__dict__.has_key(name) and name in ['graph', 'size', 'angle', 'flags', 'alpha'] and self.__dict__[name] != value:
 			self.redraw_transform_graph = True
 			
 		self.__dict__[name] = value	   
