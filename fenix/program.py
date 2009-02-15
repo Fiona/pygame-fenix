@@ -474,11 +474,14 @@ class Program:
 
         
     @classmethod        
-    def signal(cls, process, signal_code):
+    def signal(cls, process, signal_code, tree=False):
         """ Signal will let you kill a process or put it to sleep
         
             Will accept a process instance or an ID number to check against one,
             or a process type as a string to check for all of a specific type
+        
+        	The tree parameter can be used to recursively signal all the 
+        	processes(es) descendants
         
             Signal types-
             S_KILL - Permanently removes the process
@@ -495,20 +498,20 @@ class Program:
             
             for obj in process_iter:
                 if cls.processes[obj].__class__.__name__ == process:
-                    cls.single_object_signal(cls.processes[obj], signal_code)
+                    cls.single_object_signal(cls.processes[obj], signal_code, tree)
 
         # We've entered an ID number
         elif type(process) == type(1):
             process = cls.p(process)
             
             if process != None:
-                cls.single_object_signal(process, signal_code)
+                cls.single_object_signal(process, signal_code, tree)
             else:
                 return
         
         # Passed in an object directly    
         else:
-            cls.single_object_signal(process, signal_code)
+            cls.single_object_signal(process, signal_code, tree)
             return
     
     
@@ -533,8 +536,17 @@ class Program:
         
             
     @classmethod    
-    def single_object_signal(cls, process, signal_code):
+    def single_object_signal(cls, process, signal_code, tree=False):
         """ Used by signal as a shortcut """
+        
+        # do children
+        if tree:
+        	next_child = process.son
+        	while next_child != None:
+        		cls.single_object_signal(next_child, signal_code, True)
+        		next_child = next_child.bigbro
+        
+        # do this one
         if signal_code == S_KILL:
             cls.kill_process(process.id)
         elif signal_code == S_WAKEUP:

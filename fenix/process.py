@@ -10,7 +10,7 @@ import program
 
 class Process(object):
 
-	def __init__(self, *args):
+	def __init__(self, *args, **kargs):
 
 		# Stuff to be referenced
 		self.x = 0
@@ -43,7 +43,7 @@ class Process(object):
 		self.status = 0
 		self.rect = pygame.Rect(0, 0, 0, 0)
 
-		self.gen = self.begin(*args)
+		self.gen = self.begin(*args, **kargs)
 		
 		# Start off the process loop if we haven't
 		if program.Program.running == False:
@@ -229,8 +229,10 @@ class Process(object):
 			return False
 		
 		
-	def signal(self, signal_code):
-		""" Signal will let you kill the process or put it to sleep
+	def signal(self, signal_code, tree=False):
+		""" Signal will let you kill the process or put it to sleep.
+			The 'tree' parameter can be used to signal to a process and all its
+			descendant processes (provided an unbroken tree exists)
 		
 			Signal types-
 			S_KILL - Permanently removes the process
@@ -238,7 +240,7 @@ class Process(object):
 			S_FREEZE - Process will stop executing code but will still appear
 				and will still be able to be checked for collisions.
 			S_WAKEUP - Wakes up or unfreezes the process """
-		program.Program.signal(self, signal_code)
+		program.Program.signal(self, signal_code, tree)
 		
 		
 	def let_me_alone(self):
