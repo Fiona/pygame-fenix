@@ -388,10 +388,14 @@ class Program:
     # PROGRAM INTERACTION
     ##############################################
     @classmethod    
-    def set_mode(cls, resolution, fullscreen = False):
+    def set_mode(cls, resolution, fullscreen = False, use_hardware = False):
         """ Changes screen size. Accepts a tuple of width/height. """
         fullscreen = pygame.FULLSCREEN if fullscreen else 0
-        cls.screen = pygame.display.set_mode(resolution, fullscreen)  
+
+        if use_hardware:
+            fullscreen = fullscreen | pygame.HWSURFACE | pygame.DOUBLEBUF
+			
+        cls.screen = pygame.display.set_mode(resolution, fullscreen)
         cls.screen_rect = cls.screen.get_rect()
         cls.regions[0] = cls.screen.get_rect()
     
