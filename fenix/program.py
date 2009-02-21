@@ -612,7 +612,7 @@ class Program:
     def get_distx(cls, angle, distance):
         """ Returns the horisontal distance in pixels of a specified displacement. """
         return int(math.cos(
-                            math.radians(angle)
+                            math.radians(angle/1000)
                             ) * distance)
 
 
@@ -620,7 +620,7 @@ class Program:
     def get_disty(cls, angle, distance):
         """ Returns the vertical distance in pixels of a specified displacement. """
         return -int(math.sin(
-                             math.radians(angle)
+                             math.radians(angle/1000)
                              ) * distance)
 
 
