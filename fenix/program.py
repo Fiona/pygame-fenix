@@ -564,6 +564,34 @@ class Program:
     ##############################################
     # MATH STUFF
     ##############################################
+    @classmethod 
+    def normalise_angle(cls, angle):
+    	"""
+    	Returns an equivalent angle value between -180000 and 180000
+    	"""
+    	if angle > 180000:
+            angle -= 360000 * ((angle-180000)/360000 + 1)
+        if angle < -180000:
+            angle += 360000 * ((-angle-180000)/360000 + 1)
+        return angle
+    
+    @classmethod
+    def angle_difference(cls, start_angle, end_angle):
+    	"""
+    	Returns the angle to turn by to get from start_angle to end_angle.
+    	The sign of the result indicates the direction in which to turn.
+    	"""
+    	start_angle = cls.normalise_angle(start_angle)
+    	end_angle = cls.normalise_angle(end_angle)
+    	
+    	difference = end_angle - start_angle
+        if difference > 180000:
+            difference -= 360000
+        if difference < -180000:
+            difference += 360000
+            
+        return difference
+    
     @classmethod
     def near_angle(cls, curr_angle, targ_angle, increment):
         """ 
@@ -573,23 +601,13 @@ class Program:
         distance to the target angle.
         """
         # Normalise curr_angle
-        if curr_angle > 180000:
-            curr_angle -= 360000 * ((curr_angle-180000)/360000 + 1)
-        if curr_angle < -180000:
-            curr_angle += 360000 * ((-curr_angle-180000)/360000 + 1)
+        curr_angle = cls.normalise_angle(curr_angle)
             
         # Normalise targ_angle
-        if targ_angle > 180000:
-            targ_angle -= 360000 * ((curr_angle-180000)/360000 + 1)
-        if targ_angle < -180000:
-            targ_angle += 360000 * ((-curr_angle-180000)/360000 + 1)
+        targ_angle = cls.normalise_angle(targ_angle)
             
         # calculate difference
-        difference = targ_angle - curr_angle
-        if difference > 180000:
-            difference -= 360000
-        if difference < -180000:
-            difference += 360000
+        difference = cls.angle_difference(curr_angle, targ_angle)
             
         # do increment
         if math.fabs(difference) < increment:
