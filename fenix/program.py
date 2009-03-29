@@ -530,13 +530,11 @@ class Program:
             return False
 
         elif type(process_id) == type(1):
-            process_id = cls.p(process_id)
-            
-            if other != None:
-                return True if process_id.id in cls.processes else False
+        	
+           return process_id in cls.processes
             
         else:
-            return True if process_id.id in cls.processes else False
+            return process_id.id in cls.processes
         
             
     @classmethod    
@@ -570,9 +568,9 @@ class Program:
     	Returns an equivalent angle value between -180000 and 180000
     	"""
     	if angle > 180000:
-            angle -= 360000 * ((angle-180000)/360000 + 1)
+            angle -= 360000 * ((angle-180000)//360000 + 1)
         if angle < -180000:
-            angle += 360000 * ((-angle-180000)/360000 + 1)
+            angle += 360000 * ((-angle-180000)//360000 + 1)
         return angle
     
     @classmethod
