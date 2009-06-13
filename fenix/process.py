@@ -87,13 +87,15 @@ class Process(object):
 		
 		if self.ctype == C_SCROLL:
 			if self.scroll_id in program.Program.scroll:
-				x -= program.Program.scroll[self.scroll_id].x0
-				y -= program.Program.scroll[self.scroll_id].y0
+				x,y = self.calculate_scroll_draw_pos(x,y)
 			else:
 				return
 		
 		program.Program.screen.blit(self.transform_graph, self.get_draw_position(x, y), None, self.special_flags)
 
+	def calculate_scroll_draw_pos(self, x, y):
+		return (x-program.Program.scroll[self.scroll_id].x0,
+				y-program.Program.scroll[self.scroll_id].y0)
 	   
 	def get_draw_position(self, x, y):
 		center = self.transform_graph.get_size()
