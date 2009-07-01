@@ -142,15 +142,20 @@ class Process(object):
 	
 
 	def point_collision(self, point, box = False):
-		""" super fast collision check, will only check against a single point - a tuple of x,y """
+		""" 
+		super fast collision check, will only check against a single point - a tuple of x,y
+		Checks for collision against rectangle defined when "draw" is called - in other 
+		words, checks for collision with position and orientation object was last drawn at 
+		"""
+		
 		if self.rect.collidepoint(point):
 			
 			if box == True:
 				return True
 
 			point = (
-					 point[0]-(self.x-self.rect.width/2),
-					 point[1]-(self.y-self.rect.height/2)
+					 point[0]-self.rect.left,
+					 point[1]-self.rect.top
 					 )
 			"""
 			TODO: this check could be avoided if self.rect was guaranteed to be 
