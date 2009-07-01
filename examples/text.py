@@ -58,7 +58,7 @@ class Game(Process):
                 a,b = 650, 0
                 for x in message:
                     a += 25
-                    b += 20
+                    b += 20000
                     guy = Program.write(cheri_font, a, 420, text = x)
                     guy.mystery_angle = b
                     guy.init_x = a
@@ -67,9 +67,9 @@ class Game(Process):
             
             # loop through the scrolly characters and move them and stuff
             for single in scroll_text:
-                single.x -= 5
+                single.x -= 5                
                 single.y = 420 + Program.get_disty(single.mystery_angle, 30)
-                single.mystery_angle += 20
+                single.mystery_angle += 20000
                 if single.x <= -25:
                     scroll_text.remove(single)                    
                     single.signal(S_KILL)
