@@ -5,6 +5,12 @@ import math
 
 import process
 
+def is_iterable(x):
+	try:
+		iter(x)
+		return True
+	except TypeError:
+		return False
 
 class Mouse(process.Process):
 	""" Record for holding mouse info """
@@ -489,13 +495,28 @@ class Program:
 		else:
 			return None
 
+	@classmethod
+	def processes_in_status(cls, status):
+		"""
+		Returns list of processes in the given status - one of:
+			0			(normal)
+			S_FREEZE	(frozen)
+			S_SLEEP		(sleeping)			
+		"""
+		retlist = []
+		for proc_id in cls.processes:
+			proc = cls.processes[proc_id]
+			if proc.status == status:
+				retlist.append(proc)
+		return retlist
 		
 	@classmethod		
 	def signal(cls, process, signal_code, tree=False):
 		""" Signal will let you kill a process or put it to sleep
 		
 			Will accept a process instance or an ID number to check against one,
-			or a process type as a string to check for all of a specific type
+			or a process type as a string to check for all of a specific type,
+			or a list of any of the above
 		
 			The tree parameter can be used to recursively signal all the 
 			processes(es) descendants
@@ -507,12 +528,20 @@ class Program:
 				and will still be able to be checked for collisions.
 			S_WAKEUP - Wakes up or unfreezes the process """
 		
+		# We've entered a list
+		if not isinstance(process, basestring) and is_iterable(process):
+			
+			# recurse for each item of list
+			for p in process:
+				cls.signal(p, signal_code, tree)	
+		
 		# We've entered a specific type as a string
-		if type(process) == type(""):
+		elif type(process) == type(""):
 			
 			import copy
 			process_iter = copy.copy(cls.processes)
 			
+			#TODO: maybe hash by process type?
 			for obj in process_iter:
 				if cls.processes[obj].__class__.__name__ == process:
 					cls.single_object_signal(cls.processes[obj], signal_code, tree)
