@@ -509,7 +509,26 @@ class Program:
 			if proc.status == status:
 				retlist.append(proc)
 		return retlist
+
+
+	@classmethod
+	def processes_by_type(cls, type_name):
+		"""
+		Returns a list of processes with a particular class name.
+		"""
+		process_list = []
 		
+		for obj in cls.processes:
+			if type(type_name) == type(""):
+				if cls.processes[obj].__class__.__name__ == type_name:
+					process_list.append(cls.processes[obj])
+			else:
+				if isinstance(cls.processes[obj], type_name):
+					process_list.append(cls.processes[obj])
+				
+		return process_list
+	
+
 	@classmethod		
 	def signal(cls, process, signal_code, tree=False):
 		""" Signal will let you kill a process or put it to sleep
