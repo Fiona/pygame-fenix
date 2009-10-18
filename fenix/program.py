@@ -4,6 +4,7 @@ from locals import *
 import math
 
 import process
+from process import Process
 
 def is_iterable(x):
 	try:
@@ -553,6 +554,12 @@ class Program:
 			# recurse for each item of list
 			for p in process:
 				cls.signal(p, signal_code, tree)	
+		
+		# We've entered a process type
+		elif isinstance(process, type) and issubclass(process, Process):						
+			
+			for obj in cls.processes_by_type(process):
+				cls.single_object_signal(obj, signal_code, tree)
 		
 		# We've entered a specific type as a string
 		elif type(process) == type(""):
