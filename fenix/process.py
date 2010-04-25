@@ -314,4 +314,31 @@ class Process(object):
 		the end of its 'begin' method or after being killed by a signal.
 		"""
 		pass
+	
+# ---------------------------------------------------------------------------------------
+#  Testing
+# ---------------------------------------------------------------------------------------
+	
+if __name__ == "__main__":
+	import unittest
+	
+	class TestProgram(Process):		
+		def begin(self,testcase):
+			proc = TestProcess("foo")
+			testcase.assertEquals("foo",proc.text)
+			proc.signal(S_KILL)
+			yield
+	
+	class TestProcess(Process):		
+		def begin(self,text):
+			self.text = text
+			while True:
+				yield
+	
+	class ProcessTests(unittest.TestCase):
+		
+		def test_begin(self):			
+			TestProgram(self)
+			
+	unittest.main()
 
