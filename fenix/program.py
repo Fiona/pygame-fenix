@@ -1,4 +1,5 @@
 import pygame
+import pygame.mixer
 from pygame.locals import *
 from locals import *
 import math
@@ -236,6 +237,8 @@ class Program:
 	last_mouse_buttons_pressed = [False, False, False]
 	
 	mouse = None
+	
+	channels = []
 		   
 	@classmethod	
 	def init_game(cls):
@@ -875,3 +878,103 @@ class Program:
 	def delete_text(cls, text):
 		if cls.processes[text.id] != None:
 			cls.kill_process(text.id)
+			
+			
+	###############################################
+	# SOUND HANDLING
+	###############################################
+	@classmethod
+	def load_wav(cls, filename):
+		"""Loads the specified sound file into memory and returns a sound object"""
+		try:
+			sound = pygame.mixer.Sound(filename)
+		except pygame.error, message:
+			print 'Cannot load sound:', filename
+			raise SystemExit, message
+		
+		return sound		
+	
+	@classmethod
+	def play_wav(cls, wav, repeats=0):
+		"""Starts a sound playing and returns the id of the channel used. 'repeats'
+			sets the number of times to play the sound after the initial play. -1
+			can be used to loop the sound forever."""
+		channel = wav.play(repeats)
+		try:
+			return cls.channels.index(channel)
+		except ValueError:
+			cls.channels.append(channel)
+			return len(cls.channels)-1
+	
+	@classmethod
+	def pause_wav(cls, channel):
+		"""Pauses playback of sound on the specified channel. -1 can be used to stop 
+		  all sounds"""
+		if channel==-1:
+			pygame.mixer.pause()
+		else:
+			cls.channels[channel].pause()
+	
+	@classmethod
+	def resume_wav(cls, channel):
+		"""Resumes the playback of sound on the specified channel if it was previously	
+		  paused. -1 can be used to resume all sounds"""
+		if channel==-1:
+			pygame.mixer.unpause()
+		else:
+			cls.channels[channel].unpause()
+	
+	@classmethod
+	def stop_wav(cls, channel):
+		"""Stops the playback of sound on the specified channel. -1 can be used to	
+		  stop all sounds"""
+		if channel==-1:
+			pygame.mixer.stop()
+		else:
+			cls.channels[channel].stop()
+	
+	@classmethod
+	def set_wav_volume(cls, channel, volume):
+		"""Sets the volume of the specified channel from 0 (off) to 128 (full volume).	
+		  -1 can be used for the channel value to set the volume of all channels"""
+		if channel==-1:
+			any_busy = False
+			for c in cls.channels:
+				c.set_volume(volume/128.0)
+				if c.get_busy(): any_busy = True
+			return any_busy
+		else:
+			c = cls.channels[channel] 
+			c.set_volume(volume/128.0)
+			return c.get_busy()		
+	
+	@classmethod
+	def is_playing_wav(cls, channel):
+		"""Returns true if the specified channel is currently playing a sound. -1 can
+		  be used to check all channels. In this case True will be returned if any    
+		  channel is playing a sound."""
+		if channel==-1:
+			any_busy = False
+			for c in cls.channels:
+				if c.get_busy(): any_busy = True
+			return any_busy
+		else:
+			return cls.channels[channel].get_busy()
+	
+	@classmethod
+	def set_panning(cls, channel, left_vol, right_vol):
+		"""Sets left and right speaker volumes of the given channel. Volumes range	
+		  from 0 (inaudible) to 128 (full volume). -1 can be used to set the volume
+		  on all channels"""
+		if channel==-1:
+			for c in cls.channels:
+				c.set_volume(left_vol/128.0,right_vol/128.0)
+		else:
+			return cls.channels[channel].set_volume(left_vol/128.0,right_vol/128.0)
+	
+	
+	
+	
+	
+	
+	
