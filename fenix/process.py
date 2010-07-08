@@ -10,6 +10,15 @@ import program
 
 class Process(object):
 
+	_graph = None
+	_size = 100
+	_angle = 0
+	_flags = 0
+	_alpha = 255
+	_z = 0
+	_priority = 0
+	
+
 	def __init__(self, *args, **kargs):
 
 		# Stuff to be referenced
@@ -50,6 +59,69 @@ class Process(object):
 			program.Program.running = True
 			program.Program.start_game()
 
+	def get_graph(self):
+		return self._graph
+	def set_graph(self,value):
+		# mark for graph redraw if value changed
+		if self._graph != value:
+			self.redraw_transform_graph = True
+		self._graph = value		
+	graph = property(get_graph,set_graph)
+		
+	def get_size(self):
+		return self._size
+	def set_size(self,value):
+		# mark for graph redraw if value changed
+		if self._size != value:
+			self.redraw_transform_graph = True
+		self._size = value
+	size = property(get_size,set_size)
+		
+	def get_angle(self):
+		return self._angle	
+	def set_angle(self,value):
+		# mark for graph redraw if value changed
+		if self._angle != value:
+			self.redraw_transform_graph = True
+		self._angle = value
+	angle = property(get_angle,set_angle)
+			
+	def get_flags(self):
+		return self._flags	
+	def set_flags(self,value):
+		# mark for graph redraw if value changed
+		if self._flags != value:
+			self.redraw_transform_graph = True
+		self._flags = value
+	flags = property(get_flags,set_flags)
+			
+	def get_alpha(self):
+		return self._alpha	
+	def set_alpha(self,value):
+		# mark for graph redraw if value changed
+		if self._alpha != value:
+			self.redraw_transform_graph = True
+		self._alpha = value
+	alpha = property(get_alpha,set_alpha)
+			
+	def get_z(self):
+		return self._z	
+	def set_z(self,value):
+		# mark z order dirty if value changed
+		if self._z != value:
+			program.Program.z_order_dirty = True
+		self._z = value
+	z = property(get_z,set_z)
+		
+	def get_priority(self):
+		return self._priority	
+	def set_priority(self,value):
+		# mark priority order dirty if value changed
+		if self._priority != value:
+			program.Program.priority_order_dirty = True
+		self._priority = value
+	priority = property(get_priority,set_priority)
+		
 	
 	def begin(self):
 		""" This is where the main code for the process sits """
@@ -298,7 +370,7 @@ class Process(object):
 		""" Returns the distance along the y plane between two processes in pixels """
 		return -1 if not program.Program.exists(process) else program.Program.fget_dist(0, self.y, 0, process.y)
 	
-		
+	"""
 	def __setattr__(self, name, value):
 		if self.__dict__.has_key(name) and name in ['graph', 'size', 'angle', 'flags', 'alpha'] and self.__dict__[name] != value:
 			self.redraw_transform_graph = True
@@ -306,7 +378,8 @@ class Process(object):
 		self.__dict__[name] = value	   
 		if name == "z": program.Program.z_order_dirty = True
 		if name == "priority": program.Program.priority_order_dirty = True
-		
+	"""
+	
 	def on_exit(self):
 		"""
 		May be overidden by subclasses to perform cleanup operations. This method
