@@ -163,7 +163,7 @@ class Scroll:
 						Program.screen.blit(self.graph, (draw_x, draw_y))
 						draw_y += self.rect.height
 					draw_x += self.rect.width
-					 
+					
 			else:
 				Program.screen.blit(self.graph, (-self.x0, -self.y0))
 	
@@ -203,6 +203,51 @@ class Scroll:
 	def on_exit(self):
 		pass
 
+class Fade:
+	
+	status = 0
+	z = -500
+	
+	def __init__(self, start_colour, target_colour, frames, on_finish):
+		self.start_colour = start_colour
+		self.target_colour = target_colour
+		self.current_colour = start_colour
+		self.frames = frames
+		self.on_finish = on_finish
+		self.count = 0
+		self.graph = pygame.Surface((Program.screen.get_width(),Program.screen.get_height()))		
+	
+	def draw(self):
+		i = self.count / float(self.frames)
+		if i <= 1.0:
+			r = int(self.target_colour[0]*i + self.start_colour[0]*(1-i))
+			g = int(self.target_colour[1]*i + self.start_colour[1]*(1-i))
+			b = int(self.target_colour[2]*i + self.start_colour[2]*(1-i))		
+			a = int(self.target_colour[3]*i + self.start_colour[3]*(1-i))
+			self.current_colour = (r,g,b,a)				
+			self.graph.fill((r,g,b))
+			self.graph.set_alpha(a)	
+		Program.screen.blit(self.graph,(0,0))
+	
+	def loop(self):		
+		# check for target reached 
+		if self.count < self.frames and self.count+1 >= self.frames:
+			if self.on_finish != None:
+				self.on_finish()			
+			# if the fade has reached its target colour, and it's fully transparent, 
+			# just kill off the process for efficiency
+			if self.target_colour[3] <= 0:
+				# TODO: nicer way to do this?
+				if Program.active_fade == self:
+					Program.active_fade = None
+				Program.signal(self,S_KILL)
+		
+		self.count+=1						
+			
+	def on_exit(self):
+		pass
+	
+
 import time			
 
 class Program:	 
@@ -227,6 +272,7 @@ class Program:
 	screen = None
 	screen_rect = None
 	bg_colour = (0, 0, 0)
+	active_fade = None
 	
 	colorkey = (255, 0, 255)
 	
@@ -239,7 +285,7 @@ class Program:
 	mouse = None
 	
 	channels = []
-		   
+	
 	@classmethod	
 	def init_game(cls):
 		""" Initialises Pygame and starts up lots of other shizzle """
@@ -249,7 +295,7 @@ class Program:
 		pygame.key.set_repeat(10, 0)
 		
 		cls.clock = pygame.time.Clock()
-   
+
 		cls.keys_pressed  = pygame.key.get_pressed()
 		
 
@@ -269,7 +315,7 @@ class Program:
 		cls.mouse.right_up = False
 		cls.mouse.wheelup = False
 		cls.mouse.wheeldown = False	   
-				   
+			
 		while cls.running:
 			
 			cls.poll_events()
@@ -602,7 +648,7 @@ class Program:
 
 		elif type(process_id) == type(1):
 			
-		   return process_id in cls.processes
+			return process_id in cls.processes
 			
 		else:
 			return process_id.id in cls.processes
@@ -687,12 +733,12 @@ class Program:
 	
 	@classmethod	
 	def fget_angle(cls, pointax, pointay, pointbx, pointby):
-		 return math.degrees(math.atan2(-(pointby - pointay), pointbx - pointax))*1000
+		return math.degrees(math.atan2(-(pointby - pointay), pointbx - pointax))*1000
 
 
 	@classmethod	
 	def fget_dist(cls, pointax, pointay, pointbx, pointby):
-		 return int(math.sqrt((math.pow((pointby - pointay), 2) + math.pow((pointbx - pointax), 2))))
+		return int(math.sqrt((math.pow((pointby - pointay), 2) + math.pow((pointbx - pointax), 2))))
 
 
 	@classmethod
@@ -774,21 +820,21 @@ class Program:
 		
 	@classmethod	
 	def map_clear(cls, graph, colour):
-		 """
-		 Clears the surface completely with a colour.
-		 Colour is tuple (R, G, B, A)
-		 """
-		 graph.fill(colour)
+		"""
+		Clears the surface completely with a colour.
+		Colour is tuple (R, G, B, A)
+		"""
+		graph.fill(colour)
 
 
 	@classmethod	
 	def map_put_pixel(cls, graph, x, y, colour):
-		 """
-		 Will place a single pixel on a surface at the specified coordinate
-		 and at the colour specified.
-		 Colour is tuple (R, G, B, A)
-		 """
-		 graph.set_at((x, y), colour)
+		"""
+		Will place a single pixel on a surface at the specified coordinate
+		and at the colour specified.
+		Colour is tuple (R, G, B, A)
+		"""
+		graph.set_at((x, y), colour)
 
 		
 	@classmethod
@@ -802,14 +848,14 @@ class Program:
 	@classmethod	
 	def map_block_copy(cls, dest_graph, dest_x, dest_y, origin_graph,
 					   origin_x = 0, origin_y = 0, width = None, height = None, flags = 0):
-		 """
-		 Draws (blits) a rectangular block from one surface onto another surface.
-		 """
-		 # TODO: Flags
-		 width = origin_graph.get_width() if width == None else width
-		 height = origin_graph.get_height() if height == None else height
-		 
-		 dest_graph.blit(origin_graph, (dest_x, dest_y), pygame.Rect((origin_x, origin_y), (width, height)))
+		"""
+		Draws (blits) a rectangular block from one surface onto another surface.
+		"""
+		# TODO: Flags
+		width = origin_graph.get_width() if width == None else width
+		height = origin_graph.get_height() if height == None else height
+		
+		dest_graph.blit(origin_graph, (dest_x, dest_y), pygame.Rect((origin_x, origin_y), (width, height)))
 
 
 	@classmethod
@@ -836,7 +882,7 @@ class Program:
 
 		if angle != 0:
 			altered = pygame.transform.rotate(altered, angle / 1000)
-		 
+		
 		dest_graph.blit(altered, (x, y))
 
 
@@ -856,7 +902,7 @@ class Program:
 
 		if angle != 0:
 			altered = pygame.transform.rotate(altered, angle / 1000)
-		 
+			
 		dest_graph.blit(altered, (x, y))
 		
 
@@ -867,8 +913,8 @@ class Program:
 	@classmethod	
 	def load_fnt(cls, filename, size = 20):
 		return pygame.font.Font(filename, size)
-	 
-	 
+	
+	
 	@classmethod	
 	def write(cls, font, x, y, alignment = 0, text = ""):
 		return Text(font, x, y, alignment, text)
@@ -972,9 +1018,37 @@ class Program:
 		else:
 			return cls.channels[channel].set_volume(left_vol/128.0,right_vol/128.0)
 	
+	###############################################
+	# SCREEN FADING
+	###############################################
+	@classmethod
+	def fade(cls, frames=60, to_red=0, to_green=0, to_blue=0, to_alpha=0, on_finish=None):
+		"""Fades the screen from its current fade state to the target colour 
+			over the specified number of frames. The screen then remains faded
+			with this colour until another fade is requested. The on_finish 
+			parameter can be given a callback to call once the fade has reached
+			its target colour."""		
+		if cls.active_fade != None:
+			from_colour = (cls.active_fade.current_colour)
+			cls.signal(cls.active_fade, S_KILL)
+			cls.active_fade = None
+		else:
+			from_colour = (0,0,0,0)
+			
+		cls.active_fade = Fade(from_colour,(to_red,to_green,to_blue,to_alpha),frames, on_finish) 
+		cls.add_process(cls.active_fade, False)
 	
-	
-	
-	
-	
+	@classmethod
+	def fade_on(cls, frames=60, on_finish=None):
+		"""Fades in the screen from black over the specified number of frames.
+			on_finish can be given a callback to call once the fade has reached
+			its target colour"""
+		cls.fade(frames, 0,0,0,0, on_finish)
+		
+	@classmethod
+	def fade_off(cls, frames=60, on_finish=None):
+		"""Fades the screen out to black over the specified number of frames
+			on_finish can be given a callback to call once the fade has reached
+			its target colour"""
+		cls.fade(frames, 0,0,0,255, on_finish)
 	
