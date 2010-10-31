@@ -206,7 +206,7 @@ class Scroll:
 class Fade:
 	
 	status = 0
-	z = -500
+	z = -1024
 	
 	def __init__(self, start_colour, target_colour, frames, on_finish):
 		self.start_colour = start_colour
@@ -761,10 +761,10 @@ class Program:
 	# IMAGE HANDLING
 	##############################################
 	@classmethod	
-	def load_png(cls, filename, colorkey = None):
+	def load_png(cls, filename, colorkey = None, namehint=""):
 		""" Loads a file into memory and converts it accordingly """
 		try:
-			image = pygame.image.load(filename)
+			image = pygame.image.load(filename,namehint)
 		except pygame.error, message:
 			print 'Cannot load image:', filename
 			raise SystemExit, message
@@ -941,11 +941,12 @@ class Program:
 		return sound		
 	
 	@classmethod
-	def play_wav(cls, wav, repeats=0):
+	def play_wav(cls, wav, repeats=0, volume=128):
 		"""Starts a sound playing and returns the id of the channel used. 'repeats'
 			sets the number of times to play the sound after the initial play. -1
 			can be used to loop the sound forever."""
 		channel = wav.play(repeats)
+		channel.set_volume(volume/128.0)
 		try:
 			return cls.channels.index(channel)
 		except ValueError:
@@ -1025,9 +1026,10 @@ class Program:
 	def fade(cls, frames=60, to_red=0, to_green=0, to_blue=0, to_alpha=0, on_finish=None):
 		"""Fades the screen from its current fade state to the target colour 
 			over the specified number of frames. The screen then remains faded
-			with this colour until another fade is requested. The on_finish 
-			parameter can be given a callback to call once the fade has reached
-			its target colour."""		
+			with this colour until another fade is requested. Colour channel 
+			values should be between 0 and 255 inclusive. The on_finish parameter 
+			can be given a callback to call once the fade has reached its target 
+			colour."""		
 		if cls.active_fade != None:
 			from_colour = (cls.active_fade.current_colour)
 			cls.signal(cls.active_fade, S_KILL)
